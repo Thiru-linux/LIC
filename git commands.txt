@@ -1,0 +1,92 @@
+Thiru-linux Test@#1324
+
+from local m/c:
+ go to respective folder:
+
+dir
+git init
+git add filename(sample.txt)
+git commit -m "Updated my code"
+
+In  Git website - create repository called LIC as public.
+
+then come to cmd line appln ----from local m/c:
+
+git remote add origin https://github.com/Thiru-linux/LIC.git
+
+git push -u origin master
+
+it will ask to authenticate for password..provide it.( the sample.txt will get copied to LIC repository)
+
+
+make some changes in local file & make some changes in git repository file also.for sample.txt.
+git add sample.txt
+git commit -m "learnt few things"
+git push -u origin master
+
+
+it show error, because in remote repo some changes done.
+
+git pull
+
+it will show conflicts in file, because of local update & remte update by ur TL.
+
+now in local file remove all except ur TL comments and save it.
+
+git add sample.txt
+git commit -m 'ok,got updates from team lead'
+git push -u origin master
+
+now go and check in remote repository.
+
+git status
+
+
+
+
+
+
+====================================================================
+
+Learn Basic Git Commands including
+Git init
+git add 
+git commit 
+git push
+git checkout 
+git branch
+git merge 
+
+Table 1.1. Git Quick Reference
+
+Command	Description
+git clone URL	Clone an existing Git project from the remote repository at URL into the current directory.
+git status	Display the status of files in the working tree.
+git add file	Stage a new or changed file for the next commit.
+git rm file	Stage removal of a file for the next commit.
+git reset	Unstage files that have been staged for the next commit.
+git commit	Commit the staged files to the local repository with a descriptive message.
+git push	Push changes in the local repository to the remote repository.
+git pull	Fetch updates from the remote repository to the local repository and merge them into the working tree.
+git revert       commit-hash	Create a new commit, undoing the changes in the referenced commit. You can use the commit hash that identifies the commit,  
+                 although there are other ways to .reference a commit        
+git init	Create a new project.
+git log	        Display the commit log messages.
+git show commit-hash	Shows what was in the change set for a particular commit hash
+
+
+https://github.com/Thiru-linux/LIC.git
+
+echo "# LIC" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/Thiru-linux/LIC.git
+git push -u origin main
+
+
+…or push an existing repository from the command line
+git remote add origin https://github.com/Thiru-linux/LIC.git
+git branch -M main
+git push -u origin main

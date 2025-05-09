@@ -1,0 +1,427 @@
+Ansible:
+=======
+Table 1. Classroom Machines
+Machine name	IP addresses	Role
+bastion.lab.example.com	172.25.250.254	Gateway system to connect student private network to classroom server (must always be running)
+utility.lab.example.com	172.25.250.8	System with utility services required for the classroom
+workstation.lab.example.com	172.25.250.9	Graphical workstation used for system administration
+servera.lab.example.com	172.25.250.10	Host managed with Ansible
+serverb.lab.example.com	172.25.250.11	Host managed with Ansible
+serverc.lab.example.com	172.25.250.12	Host managed with Ansible
+serverd.lab.example.com	172.25.250.13	Host managed with Ansible
+
+All student computer systems have a standard user account, student, which has the password student. 
+
+The root password on all student systems is redhat.
+
+Controlling Your Systems
+Table 2.  rht-vmctl Commands
+
+Action	Command
+Start server machine	                                                         rht-vmctl start server
+View "physical console" to log in and work with the server machine	         rht-vmview view server
+Reset server machine to its previous state and restart the virtual machine	 rht-vmctl reset server
+
+
+Control node:
+=============
+sudo dnf install ansible-navigator
+ ansible-navigator --version
+
+sudo dnf install ansible-core
+
+
+
+Ansible:
+=========
+Ansible is an free automation tool that can automate IT tasks on local machine, where it is running and on remote machines.
+
+Note: Ansible is written in python language , but it does not mean you need python knowledge to use ansible.
+
+
+In Ansible, a fork refers to the number of parallel processes (SSH connections) . Ansible will use to execute tasks on multiple hosts simultaneously.
+
+Ansible uses parallelism by default, and this is controlled by the forks setting in the configuration.
+
+How to Change Forks
+You can increase the number of forks to improve speed (if your control node has enough resources):
+
+🔧 Option 1: In ansible.cfg
+ini
+Copy
+Edit
+[defaults]
+forks = 20
+🔧 Option 2: Via CLI
+bash
+Copy
+Edit
+ansible-playbook playbook.yml -f 20
+
+Hosts to Manage	Recommended Forks
+10–50	  5–10
+100–500	  20–50
+>500	   50+ (test first!)
+
+
+• Control node or Ansible Server
+• Server which runs Ansible application
+
+• Modules
+• Module is a command meant to be executed on the client-side
+
+• Most of the IT tasks modules are already created and can be found on Ansible website
+• www.docs.ansible.com → search for module index
+• www.galaxy.ansible.com
+
+• Example of modules:
+1. Install http
+2. Enable http service
+3. Start http service
+
+• Task
+• A task is a section that consists of a single procedure to be completed. A task can have 
+multiple modules
+
+• Playbook
+• Automation file with step-by-step execution of multiple tasks
+
+• YAML
+• A Playbook written in YAML language (Yet another markup language)
+
+• Inventory
+• File that has information about remote clients where tasks are executed
+
+• Tag
+• A reference or alias to a specific task - Run only specific parts of a playbook
+
+• Variable
+• Variables are like containers that holds the defined value which can be used repetitively 
+
+• Role
+• Splitting of Playbook into smaller groups.
+  Roles let you automatically load related vars, files, tasks, 
+handlers, and other Ansible artifacts based on a known file structure. After you group your content in 
+roles, you can easily reuse them and share them with other users
+
+Handlers:
+=========
+Handlers are executed at the end of the play once all tasks are finished
+The option used to call handler - notify
+
+
+Roles: Reusable playbook components (roles/ directory).
+
+Handlers: Trigger actions when tasks change (e.g., restart service).
+
+Templates: Jinja2-based configuration files.
+
+Tags: Run only specific parts of a playbook.
+
+Vault: Encrypt secrets.
+
+
+Ansible work flow:
+===================
+Inventory ➝ Playbook ➝ Variables ➝ Execute Tasks ➝ Output
+    │           │            │              │         └──> Results (ok/changed/failed)
+    └── Hosts   └── YAML     └── group_vars │
+                                      └─────┘
+
+5. Ansible Executes in This Order:
+For each host:
+
+Establish SSH connection.
+Gather facts (unless gather_facts: no).
+Execute each task in order.
+Report results (ok, changed, failed, skipped).
+
+
+
+How ansible works:
+
+Each specific task in Ansible written through modules.
+Multiple modules written in sequential order.
+Multiple modules for related tasks is called a play.
+All plays together makes a playbook
+Playbook is written as a file format called YAML.
+
+used to Provision system.
+used to configure system.
+used to Deploy Apps.
+used to Manage system and apps.
+
+
+ex:
+web servers
+install httpd-------------- module 
+enable httpd----------------module 
+start httpd-----------------module     play
+
+
+enable http port on firewall  ------- module ------   play ------   playbook 
+
+firewall-cmd --add-port=80/tcp --permanent
+firewall-cmd --add-port=443/tcp --permanent
+firewall-cmd --reload
+firewall-cmd --list-all
+
+
+ 
+
+wget https://dlcdn.apache.org/tomcat/tomcat-11/v11.0.5/bin/apache-tomcat-11.0.5.tar.gz
+
+
+curl -o my-tomcat-11.0.5.tar.gz https://dlcdn.apache.org/tomcat/tomcat-11/v11.0.5/bin/apache-tomcat-11.0.5.tar.gz
+curl -L https://dlcdn.apache.org/tomcat/tomcat-11/v11.0.5/bin/apache-tomcat-11.0.5.tar.gz | tar -xz
+curl -L https://dlcdn.apache.org/tomcat/tomcat-11/v11.0.5/bin/apache-tomcat-11.0.5.tar.gz | tar -xz -C /etc/ansible/playbooks/curl
+
+curl https://dlcdn.apache.org
+curl -o /dev/null -s -w "%{http_code}\n" https://dlcdn.apache.org
+curl -I https://dlcdn.apache.org
+curl -o /dev/null -s -w "Time: %{time_total}s\n" https://dlcdn.apache.org
+
+
+
+if curl -s --head --request GET https://dlcdn.apache.org | grep "200 OK" > /dev/null
+then 
+   echo "✅ Website is UP"
+else 
+   echo "❌ Website is DOWN"
+fi
+
+
+
+
+Command examples:
+=================
+To run modules through YAML file:
+# ansible-playbook example.yml
+
+To run module independendently.
+#ansible myservers -m ping
+
+Ansible configuration files.
+/etc/ansible/ansible.cfg
+/etc/ansible/hosts
+/etc/ansible/roles
+
+---  -yaml file
+  -  name: sample playbook   ------ name of the entire playbook
+     hosts: all or localhost  ------where u want to run 
+     become: yes---------------------run as a diiff user?
+     become_user: root
+
+
+ansible-playbook --syntax-check first.yml
+ansible-playbook --check first.yml
+
+To RUn:
+ansible-playbook first.yml
+
+for install - state:  present 
+
+Adhoc command to check:
+=======================
+ansible all -m ping 
+ansible -a "uptime" all
+
+
+From workstation:
+==================
+cd /etc/ansible/hosts
+ansible-inventory --list
+client 1: 172.25.250.10
+client 1: 172.25.250.11
+
+Setup apache and open firewall port:
+-------------------------------------
+
+In control node:(install additional ansible collection for firewalld)
+
+ansible-galaxy collection install ansible.posix
+
+state:
+present or installed   ----------install
+absent or removed    ----------un-install
+latest=upgrade
+
+state ---  started|stopped|reloaded|restarted
+
+
+For new partion creation and f/s and mount :Need to install parted & mount module:
+=================================================
+
+ansible-galaxy collection install community.general 
+ansible-galaxy collection install ansible.posix
+
+Pick and choose steps:
+=======================
+ansible-playbook http.yml --start-at-task 'start httpd'   - it will skip install and start playbook from start httpd
+
+
+LAB:1-Student Guide
+
+lab intro-install start
+yum install ansible
+ansible --version
+ansible -m setup localhost | grep ansible_python_version
+lab intro-install finish
+
+
+Lab:2
+add entry in /etc/ansible/hosts.
+ansible all --list-hosts
+ansible ungrouped --list-hosts
+ansible webservers --list-hosts
+
+Create a custom static entry in home folder:
+[student@workstation ~]$ mkdir ~/deploy-inventory
+[student@workstation ~]$ cd ~/deploy-inventory
+[student@workstation deploy-inventory]$
+
+
+[webservers]
+server[a:d].lab.example.com
+
+[raleigh]
+servera.lab.example.com
+serverb.lab.example.com
+
+[mountainview]
+serverc.lab.example.com
+
+[london]
+serverd.lab.example.com
+
+[development]
+servera.lab.example.com
+
+[testing]
+serverb.lab.example.com
+
+[production]
+serverc.lab.example.com
+serverd.lab.example.com
+
+[us:children]
+raleigh
+mountainview
+
+ansible all -i inventory --list-hosts         ( to list hosts in current dir) instead of /etc/ansible/hosts
+ansible ungrouped -i inventory --list-hosts
+ansible development -i inventory --list-hosts
+ansible testing -i inventory --list-hosts
+ansible production -i inventory --list-hosts
+ansible us -i inventory --list-hosts
+
+Managing Ansible Configuration Files:
+======================================
+Using /etc/ansible/ansible.cfg
+Using ~/.ansible.cfg
+Using ./ansible.cfg
+
+
+Note:
+The recommended practice is to create an ansible.cfg file in a directory from which you run Ansible commands. This directory would also contain any files used by your Ansible project,
+such as an inventory and a playbook. This is the most common location used for the Ansible configuration file. 
+It is unusual to use a ~/.ansible.cfg or /etc/ansible/ansible.cfg file in practice.
+
+Using the ANSIBLE_CONFIG environment variable
+-A more flexible option is to define the location of the configuration file with the ANSIBLE_CONFIG environment variable. When this variable is defined, 
+Ansible uses the configuration file that the variable specifies instead of any of the previously mentioned configuration files.
+
+Configuration File Precedence
+The search order for a configuration file is the reverse of the preceding list. The first file located in the search order is the one that Ansible selects.
+Ansible only uses configuration settings from the first file that it finds.
+Any file specified by the ANSIBLE_CONFIG environment variable overrides all other configuration files.
+
+Because of the multitude of locations in which Ansible configuration files can be placed, it can be confusing which configuration file is being used by Ansible. 
+You can run the ansible --version command to clearly identify which version of Ansible is installed, and which configuration file is being used.
+
+Another way to display the active Ansible configuration file is to use the -v option when executing Ansible commands on the command line.
+
+[user@controlnode ~]$ ansible servers --list-hosts -v
+Using /etc/ansible/ansible.cfg as config file
+...output omitted...
+
+Table 2.2. Ansible Configuration
+
+Directive	Description
+inventory	Specifies the path to the inventory file.
+remote_user	The name of the user to log in as on the managed hosts. If not specified, the current user's name is used.
+ask_pass	Whether or not to prompt for an SSH password. Can be false if using SSH public key authentication.
+become	Whether to automatically switch user on the managed host (typically to root) after connecting. This can also be specified by a play.
+become_method	How to switch user (typically sudo, which is the default, but su is an option).
+become_user	The user to switch to on the managed host (typically root, which is the default).
+become_ask_pass	Whether to prompt for a password for your become_method. Defaults to false
+
+
+One way to enable a user (someuser in the following example) to use sudo to become root without a password is to install a file with the appropriate directives into the 
+/etc/sudoers.d directory (owned by root, with octal permissions 0400):
+
+## password-less sudo for Ansible user
+someuser ALL=(ALL) NOPASSWD:ALL
+Think through the security implications of whatever approach you choose for privilege escalation. Different organizations and deployments might have different trade-offs to consider.
+
+The following example ansible.cfg file assumes that you can connect to the managed hosts as someuser using SSH key-based authentication, 
+and that someuser can use sudo to run commands as root without entering a password:
+
+[defaults]
+inventory = ./inventory
+remote_user = someuser
+ask_pass = false
+
+[privilege_escalation]
+become = true
+become_method = sudo
+become_user = root
+become_ask_pass = false
+
+if u run as normal user:
+========================***************
+syntax:
+=======
+
+- hosts: all
+  become: yes   ------------------this is important to mention
+  tasks:
+    - name: Copy file
+      copy:
+        src: ./something
+        dest: /etc/something
+
+
+ansible-playbook -C yourplaybook.yml --ask-become-pass
+ansible-playbook yourplaybook.yml --ask-become-pass   --------------------- it will copy file when u run as normal user
+
+Table 2.3. Ansible Modules:
+=========================
+
+Module category	Modules
+
+Files modules	
+copy: Copy a local file to the managed host
+file: Set permissions and other properties of files
+lineinfile: Ensure a particular line is or is not in a file
+synchronize: Synchronize content using rsync
+
+Software package modules	
+package: Manage packages using autodetected package manager native to the operating system
+yum: Manage packages using the YUM package manager
+apt: Manage packages using the APT package manager
+dnf: Manage packages using the DNF package manager
+gem: Manage Ruby gems
+pip: Manage Python packages from PyPI
+
+System modules	
+firewalld: Manage arbitrary ports and services using firewalld
+reboot: Reboot a machine
+service: Manage services
+user: Add, remove, and manage user accounts
+Net Tools modules	
+get_url: Download files over HTTP, HTTPS, or FTP
+
+nmcli: Manage networking
+
+uri: Interact with web services
