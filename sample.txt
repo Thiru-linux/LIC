@@ -1,4 +1,2 @@
-This is sample git test
+some random checks
 
-my git learnings today
-git add , git commit
